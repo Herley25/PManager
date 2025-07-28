@@ -1,5 +1,6 @@
 package com.java360.pmanager.domain.applicationService;
 
+import com.java360.pmanager.domain.entity.Member;
 import com.java360.pmanager.domain.entity.Project;
 import com.java360.pmanager.domain.exception.DuplicateProjectException;
 import com.java360.pmanager.domain.exception.InvalidProjectStatusException;
@@ -12,8 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor // Anotações do Lombok para injeção de dependência
@@ -21,6 +23,7 @@ import java.util.UUID;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final MemberService memberService;
 
     @Transactional // Anotação do Spring Data para indicar que este método deve ser executado dentro de uma transação
     public Project createProject(SaveProjectDataDTO saveProjectDataDTO) { // Método para criar um novo projeto
@@ -40,6 +43,9 @@ public class ProjectService {
 
         // Salva o projeto no repositório e retorna o projeto salvo
         Project savedProject = projectRepository.save(project);
+
+        // Adiciona os membros ao projeto, se houver IDs de membros fornecidos no DTO
+        addMemberToProject(saveProjectDataDTO.getMemberIds(), project);
 
         log.info("Project created: {}", project); // Loga o ID do projeto criado
         return savedProject; // Retorna o projeto salvo com o ID gerado pelo banco de dados
@@ -73,6 +79,9 @@ public class ProjectService {
         project.setFinalDate(saveProjectDataDTO.getFinalDate());
         project.setStatus(convertToProjectStatus(saveProjectDataDTO.getStatus())); // Atualiza o status do projeto
 
+        // Adiciona os membros ao projeto, se houver IDs de membros fornecidos no DTO
+        addMemberToProject(saveProjectDataDTO.getMemberIds(), project);
+
         // Salva as alterações no repositório e retorna o projeto atualizado
         // Project updatedProject = projectRepository.save(project);
         log.info("Project updated: {}", project);
@@ -92,5 +101,18 @@ public class ProjectService {
                 .findByName(name)
                 .filter(p -> !Objects.equals(p.getId(), idToExclude))
                 .isPresent(); // Verifica se existe um projeto com o mesmo nome, excluindo o ID fornecido
+    }
+
+    private void addMemberToProject(Set<String> memberIds, Project project) {
+        Set<String> memberIdsNotNull = Optional.ofNullable(memberIds).orElse(Set.of()); // Garante que memberIds não seja nulo, usando um Set vazio se for o caso
+
+        List<Member> members = memberIdsNotNull.stream().map(
+                memberId -> {
+                    UUID uuid = UUID.fromString(memberId); // Converte o ID de String para UUID
+                    return memberService.loadMemberById(uuid); // Carrega o membro pelo ID
+                }) // Mapeia cada ID de membro para um objeto Member
+                .collect(toList()); // Coleta os membros em uma lista
+
+        project.setMembers(members); // Define os membros do projeto
     }
 }
