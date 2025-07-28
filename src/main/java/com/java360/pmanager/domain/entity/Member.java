@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity // Anota que a classe como uma entidade JPA
@@ -32,4 +33,7 @@ public class Member {
 
     @Column(name = "delete", nullable = false)
     private Boolean deleted;
+
+    @ManyToMany(mappedBy = "members") // Define um relacionamento muitos-para-muitos com a entidade Project
+    private List<Project> projects; // Lista de projetos associados ao membro
 }

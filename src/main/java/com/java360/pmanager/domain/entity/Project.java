@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity // Anotação do JPA que indica que esta classe é uma entidade persistente
@@ -38,4 +39,12 @@ public class Project {
     @Column(name = "status", nullable = false) // Define a coluna status como não nula
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
+
+    @ManyToMany // Define um relacionamento muitos-para-muitos com a entidade Member
+    @JoinTable(
+            name = "project_member", // Nome da tabela de junção
+            joinColumns = @JoinColumn(name = "project_id"), // Coluna que referencia o projeto
+            inverseJoinColumns = @JoinColumn(name = "member_id") // Coluna que referencia o membro
+    ) // Define a tabela de junção entre projetos e membros
+    private List<Member> members; // Lista de membros associados ao projeto
 }
