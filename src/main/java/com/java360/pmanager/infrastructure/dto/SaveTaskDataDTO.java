@@ -19,4 +19,8 @@ public class SaveTaskDataDTO {
     private final Integer numberOfDays; // Número de dias estimados para a tarefa
 
     private final String status; // Status da tarefa, representado como uma string (pode ser convertido para um enum posteriormente)
+
+    private final String projectId; // ID do projeto ao qual a tarefa pertence, representado como uma string
+
+    private final String memberId; // ID do membro atribuído à tarefa, representado como uma string
 }

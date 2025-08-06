@@ -33,4 +33,12 @@ public class Task {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "project_id") // Define a coluna que referencia o projeto
+    private Project project; // Referência ao projeto ao qual a tarefa pertence, pode ser uma relação @ManyToOne se necessário
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_member") // Define a coluna que referencia o membro atribuído
+    private Member assignedMember; // Referência ao membro atribuído à tarefa, pode ser uma relação @ManyToOne se necessário
 }
