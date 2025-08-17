@@ -4,6 +4,7 @@ import com.java360.pmanager.domain.entity.Task;
 import com.java360.pmanager.domain.model.TaskStatus;
 import lombok.Data;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Data // Anotação Lombok para gerar getters, setters, toString, equals e hashCode
@@ -23,8 +24,8 @@ public class TaskDTO { // Classe DTO (Data Transfer Object) para representar uma
                 task.getDescription(),
                 task.getNumberOfDays(),
                 task.getStatus(),
-                ProjectDTO.create(task.getProject()), // Cria um ProjectDTO a partir do projeto da tarefa
-                MemberDTO.create(task.getAssignedMember()) // Cria um MemberDTO a partir do membro atribuído à tarefa
+                Optional.ofNullable(task.getProject()).map(ProjectDTO::create).orElse(null), // Cria um ProjectDTO a partir do projeto da tarefa
+                Optional.ofNullable(task.getAssignedMember()).map(MemberDTO::create).orElse(null) // Cria um MemberDTO a partir do membro atribuído à tarefa
         );
     }
 }

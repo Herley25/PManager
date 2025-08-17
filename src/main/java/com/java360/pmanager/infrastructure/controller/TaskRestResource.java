@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import static com.java360.pmanager.infrastructure.controller.RestConstants.PATH_PROJECTS;
@@ -58,5 +59,22 @@ public class TaskRestResource {
         UUID uuid = UUID.fromString(taskId); // Conversão segura do ID de String para UUID
         Task task = taskService.updateTask(uuid, saveTaskDataDTO); // Atualiza a tarefa
         return ResponseEntity.ok(TaskDTO.create(task)); // Retorna a tarefa atualizada como DTO
+    }
+
+    // Método para buscar tarefas com filtros opcionais
+    @GetMapping
+    public ResponseEntity<List<TaskDTO>> findTasks(
+            @RequestParam(value = "projectId", required = false) String projectId,
+            @RequestParam(value = "memberId", required = false) String memberId,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "title", required = false) String title
+    ) {
+        List<Task> tasks = taskService.findTasks(projectId, memberId, status, title);
+
+        return ResponseEntity.ok(
+                tasks.stream()
+                        .map(TaskDTO::create)
+                        .toList()
+        ); // Retorna a lista de tarefas como DTOs
     }
 }

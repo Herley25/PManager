@@ -48,6 +48,6 @@ public class Project {
     ) // Define a tabela de junção entre projetos e membros
     private List<Member> members; // Lista de membros associados ao projeto
 
-    @OneToMany(mappedBy = "project") // Define um relacionamento um-para-muitos com a entidade Task
+    @OneToMany(mappedBy = "project", orphanRemoval = true) // Define um relacionamento um-para-muitos com a entidade Task
     private List<Task> tasks; // Lista de tarefas associadas ao projeto
 }
