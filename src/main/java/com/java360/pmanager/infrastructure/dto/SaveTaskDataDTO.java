@@ -8,19 +8,19 @@ import lombok.Data;
 @Data // Anotação Lombok para gerar getters, setters, toString, equals e hashCode
 public class SaveTaskDataDTO {
     @NotNull(message = "Title cannot be empty") // Validação para garantir que o título não seja nulo
-    private final String title; // Título da tarefa
+    private String title; // Título da tarefa
 
     @NotNull(message = "Description cannot be empty") // Validação para garantir que a descrição não seja nula
     @Size(min = 1, max = 150, message = "Invalid description length") // Validação para garantir que a descrição tenha um tamanho válido
-    private final String description; // Descrição da tarefa
+    private String description; // Descrição da tarefa
 
     @NotNull
     @Positive(message = "Number of days must be a positive integer") // Validação para garantir que o número de dias seja um inteiro positivo
-    private final Integer numberOfDays; // Número de dias estimados para a tarefa
+    private Integer numberOfDays; // Número de dias estimados para a tarefa
 
-    private final String status; // Status da tarefa, representado como uma string (pode ser convertido para um enum posteriormente)
+    private String status; // Status da tarefa, representado como uma string (pode ser convertido para um enum posteriormente)
 
-    private final String projectId; // ID do projeto ao qual a tarefa pertence, representado como uma string
+    private String projectId; // ID do projeto ao qual a tarefa pertence, representado como uma string
 
-    private final String memberId; // ID do membro atribuído à tarefa, representado como uma string
+    private String memberId; // ID do membro atribuído à tarefa, representado como uma string
 }
