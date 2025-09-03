@@ -8,8 +8,12 @@ import com.java360.pmanager.domain.exception.TaskNotFoundException;
 import com.java360.pmanager.domain.model.TaskStatus;
 import com.java360.pmanager.domain.repository.TaskRepository;
 import com.java360.pmanager.infrastructure.dto.SaveTaskDataDTO;
+import com.java360.pmanager.infrastructure.util.PaginationHelper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -95,12 +99,16 @@ public class TaskService {
     }
 
     // Método para buscar tarefas com filtros opcionais
-    public List<Task> findTasks(
+    public Page<Task> findTasks(
             String projectId,
             String memberId,
             String status,
-            String title
+            String title,
+            Integer page,
+            String direction,
+            List<String> properties
     ) {
+
         // Converte os IDs de String para UUID, se fornecidos
         UUID uuidProject = null;
         UUID uuidMember = null;
@@ -112,18 +120,20 @@ public class TaskService {
         }
 
         // Chama o repositório para buscar as tarefas com os filtros aplicados
-       return taskRepository.find(
-               uuidProject,
-               uuidMember,
-               Optional.ofNullable(status).map(this::convertToTaskStatus).orElse(null),
-               title
-       );
+        return taskRepository.find(
+                uuidProject,
+                uuidMember,
+                Optional.ofNullable(status).map(this::convertToTaskStatus).orElse(null),
+                title,
+                PaginationHelper.createPageable(page, 3, direction, properties) // Define a paginação com tamanho de página 3 e ordenação por título decrescente
+        );
     }
 
     private TaskStatus convertToTaskStatus(String status) {
         try {
             return TaskStatus.valueOf(status.toUpperCase()); // Converte a string para o enum TaskStatus
-        } catch (IllegalArgumentException | NullPointerException e) { // Captura exceções se a string não corresponder a nenhum valor do enum
+        } catch (IllegalArgumentException |
+                 NullPointerException e) { // Captura exceções se a string não corresponder a nenhum valor do enum
             throw new InvalidTaskStatusException(status); // Lança exceção se o status for inválido
         }
     }

@@ -8,13 +8,16 @@ import com.java360.pmanager.infrastructure.dto.ProjectDTO;
 import com.java360.pmanager.infrastructure.dto.SaveProjectDataDTO;
 import com.java360.pmanager.infrastructure.dto.SaveTaskDataDTO;
 import com.java360.pmanager.infrastructure.dto.TaskDTO;
+import com.java360.pmanager.infrastructure.util.SortProperties;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.java360.pmanager.infrastructure.controller.RestConstants.PATH_PROJECTS;
@@ -67,9 +70,20 @@ public class TaskRestResource {
             @RequestParam(value = "projectId", required = false) String projectId,
             @RequestParam(value = "memberId", required = false) String memberId,
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "title", required = false) String title
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "direction", required = false) String direction,
+            @RequestParam(value = "sort", required = false) SortProperties properties
     ) {
-        List<Task> tasks = taskService.findTasks(projectId, memberId, status, title);
+        Page<Task> tasks = taskService.findTasks(
+                projectId,
+                memberId,
+                status,
+                title,
+                page,
+                direction,
+                Optional.ofNullable(properties).map(SortProperties::getSortPropertiesList).orElse(List.of())
+        );
 
         return ResponseEntity.ok(
                 tasks.stream()
